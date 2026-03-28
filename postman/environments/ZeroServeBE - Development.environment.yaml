@@ -1,0 +1,11 @@
+name: ZeroServeBE - Development
+values:
+  - key: baseUrl
+    value: 'http://localhost:8000'
+    enabled: true
+  - key: accessToken
+    value: ''
+    enabled: true
+  - key: foodId
+    value: ''
+    enabled: true

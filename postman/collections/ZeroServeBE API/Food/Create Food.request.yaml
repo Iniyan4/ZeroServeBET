@@ -1,0 +1,41 @@
+$kind: http-request
+name: Create Food
+method: POST
+url: '{{baseUrl}}/api/v1/food/create/'
+order: 1000
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{accessToken}}'
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "title": "Fresh Biryani",
+      "description": "Leftover from event, still hot",
+      "food_category": "cooked",
+      "quantity": 10,
+      "servings": 20,
+      "is_veg": true,
+      "prepared_at": "2026-03-28T06:00:00Z",
+      "pickup_address": "123 Main Street, Chennai",
+      "latitude": 13.0827,
+      "longitude": 80.2707
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status code is 200", function () {
+          pm.response.to.have.status(200);
+      });
+      pm.test("Food created successfully", function () {
+          var json = pm.response.json();
+          pm.expect(json.success).to.be.true;
+          pm.expect(json.data.id).to.be.a('number');
+          pm.environment.set("foodId", json.data.id);
+      });

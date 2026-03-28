@@ -1,0 +1,14 @@
+name: ZeroServeBE - Production
+values:
+  - key: baseUrl
+    value: 'https://api.zeroserve.com'
+    enabled: true
+    type: default
+  - key: accessToken
+    value: ''
+    enabled: true
+    type: default
+  - key: foodId
+    value: ''
+    enabled: true
+    type: default
