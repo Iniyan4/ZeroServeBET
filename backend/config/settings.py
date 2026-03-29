@@ -87,12 +87,22 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
  # pip install dj-database-url
+import os
+
 DATABASES = {
-    'default': dj_database_url.config(
-        default=os.environ.get('DATABASE_URL'),
-        conn_max_age=600,
-        ssl_require=True # Aiven and most cloud MySQL require SSL
-    )
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'zeroserve',
+        'USER': 'avnadmin',
+        'PASSWORD': 'AVNS_WZvwh7ywJKwWUTxsC_7',
+        'HOST': 'mysql-6dbef97-harishiniyan20-4390.j.aivencloud.com',
+        'PORT': '10518',
+        'OPTIONS': {
+            'ssl': {
+                'ca': os.path.join(BASE_DIR, 'ca.pem'),
+            }
+        }
+    }
 }
 
 
