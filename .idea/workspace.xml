@@ -4,21 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="2444528e-34ad-4815-b012-92d30a87de28" name="Changes" comment="Backend V2.0">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/ai_support/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/ai_support/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/ai_support/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/ai_support/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/analytics/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/analytics/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/claims/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/claims/serializers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/claims/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/claims/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/claims/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/claims/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/config/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/config/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/delivery/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/delivery/serializers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/delivery/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/delivery/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/food/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/food/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/reliability/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/reliability/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/urgency_engine.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/services/urgency_engine.py" afterDir="false" />
-    </list>
+    <list default="true" id="2444528e-34ad-4815-b012-92d30a87de28" name="Changes" comment="Backend V3.0" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -129,7 +115,7 @@
       <workItem from="1774706767764" duration="5230000" />
       <workItem from="1774750581864" duration="3317000" />
       <workItem from="1774766468984" duration="19208000" />
-      <workItem from="1774810073208" duration="10040000" />
+      <workItem from="1774810073208" duration="10480000" />
     </task>
     <task id="LOCAL-00001" summary="Backend V1.0">
       <option name="closed" value="true" />
@@ -147,7 +133,15 @@
       <option name="project" value="LOCAL" />
       <updated>1774798212915</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Backend V3.0">
+      <option name="closed" value="true" />
+      <created>1774821494526</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1774821494526</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -167,6 +161,7 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Backend V1.0" />
     <MESSAGE value="Backend V2.0" />
-    <option name="LAST_COMMIT_MESSAGE" value="Backend V2.0" />
+    <MESSAGE value="Backend V3.0" />
+    <option name="LAST_COMMIT_MESSAGE" value="Backend V3.0" />
   </component>
 </project>
