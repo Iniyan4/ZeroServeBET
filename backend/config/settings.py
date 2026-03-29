@@ -92,11 +92,11 @@ import os
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'zeroserve',
-        'USER': 'avnadmin',
-        'PASSWORD': 'AVNS_WZvwh7ywJKwWUTxsC_7',
-        'HOST': 'mysql-6dbef97-harishiniyan20-4390.j.aivencloud.com',
-        'PORT': '10518',
+        'NAME': os.environ.get('DB_NAME'),
+        'USER': os.environ.get('DB_USER'),
+        'PASSWORD': os.environ.get('DB_PASSWORD'),
+        'HOST': os.environ.get('DB_HOST'),
+        'PORT': os.environ.get('DB_PORT'),
         'OPTIONS': {
             'ssl': {
                 'ca': os.path.join(BASE_DIR, 'ca.pem'),
