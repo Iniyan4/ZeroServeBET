@@ -5,7 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2444528e-34ad-4815-b012-92d30a87de28" name="Changes" comment="requirement.txt">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/config/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/config/settings.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -117,7 +117,7 @@
       <workItem from="1774706767764" duration="5230000" />
       <workItem from="1774750581864" duration="3317000" />
       <workItem from="1774766468984" duration="19208000" />
-      <workItem from="1774810073208" duration="15203000" />
+      <workItem from="1774810073208" duration="15344000" />
     </task>
     <task id="LOCAL-00001" summary="Backend V1.0">
       <option name="closed" value="true" />
@@ -199,7 +199,15 @@
       <option name="project" value="LOCAL" />
       <updated>1774826652224</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="requirement.txt">
+      <option name="closed" value="true" />
+      <created>1774826965514</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1774826965514</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
