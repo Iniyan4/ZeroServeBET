@@ -148,3 +148,24 @@ def list_violations(request, user_id):
         "success": True,
         "data": ViolationSerializer(qs, many=True).data
     })
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def admin_user_action(request, user_id):
+    if request.user.role != 'admin':
+        return Response({"error": "Unauthorized"}, status=403)
+
+    action = request.data.get('action')
+    try:
+        user = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        return Response({"error": "User not found"}, status=404)
+
+    if action == 'restrict':
+        user.is_active = False # Or a custom is_restricted field
+        user.save()
+    elif action == 'approve':
+        # Logic to reset flags or clear review status
+        pass
+
+    return Response({"success": True, "message": f"User {action}ed successfully"})

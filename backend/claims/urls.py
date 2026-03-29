@@ -4,7 +4,7 @@ from .views import (
     accept_claim,
     reject_claim,
     my_claims,
-    food_claims
+    food_claims, verify_delivery, dispute_delivery
 )
 
 urlpatterns = [
@@ -13,4 +13,6 @@ urlpatterns = [
     path('<int:claim_id>/reject/', reject_claim),
     path('my/', my_claims),
     path('food/<int:food_id>/', food_claims),
+    path('<int:claim_id>/verify/', verify_delivery),
+    path('<int:claim_id>/dispute/', dispute_delivery),
 ]

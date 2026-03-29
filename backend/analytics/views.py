@@ -1,6 +1,8 @@
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from django.utils import timezone
+from django.db.models import Sum
 
 from food.models import FoodListing
 from delivery.models import DeliveryTask
@@ -11,17 +13,67 @@ from services.ai_agent import analyze_user
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def admin_analytics(request):
+    # Ensure admin only access if needed, e.g., if request.user.role != 'admin': return Response(403)
 
-    total_food = FoodListing.objects.count()
-    total_delivered = FoodListing.objects.filter(status='delivered').count()
-    total_claims = Claim.objects.count()
+    # ==========================
+    # 1. DONOR AGGREGATES
+    # ==========================
+    total_donated = FoodListing.objects.count()
+    # Safely sum servings, fallback to 0 if no food exists
+    total_servings = FoodListing.objects.aggregate(Sum('servings'))['servings__sum'] or 0
+    # Count unique NGOs that have claimed food
+    ngos_served = Claim.objects.filter(status__in=['accepted', 'completed']).values('ngo').distinct().count()
+    # Today's donations
+    today = timezone.now().date()
+    daily_summary = FoodListing.objects.filter(created_at__date=today).count()
 
+    # ==========================
+    # 2. NGO AGGREGATES
+    # ==========================
+    # Total claims successfully completed
+    food_received = Claim.objects.filter(status='completed').count()
+    deliveries_completed = DeliveryTask.objects.filter(status='delivered').count()
+    # Count unique donors whose food was accepted
+    donors_served = Claim.objects.filter(status__in=['accepted', 'completed']).values('food__donor').distinct().count()
+    # Count unique delivery partners involved in moving food
+    partners_involved = DeliveryTask.objects.filter(status__in=['picked_up', 'in_transit', 'delivered']).values('delivery_partner').distinct().count()
+
+    # ==========================
+    # 3. DELIVERY AGGREGATES
+    # ==========================
+    total_tasks = DeliveryTask.objects.count()
+    completed_tasks = DeliveryTask.objects.filter(status='delivered').count()
+
+    # Calculate success rate safely
+    success_rate = f"{int((completed_tasks / total_tasks) * 100)}%" if total_tasks > 0 else "0%"
+
+    customers_served = DeliveryTask.objects.filter(status='delivered').values('claim__ngo').distinct().count()
+    active_now = DeliveryTask.objects.filter(status__in=['assigned', 'accepted', 'picked_up', 'in_transit']).count()
+
+    # ==========================
+    # Return the Nested Structure
+    # ==========================
     return Response({
         "success": True,
         "data": {
-            "total_food_listings": total_food,
-            "total_delivered": total_delivered,
-            "total_claims": total_claims,
+            "donor": {
+                "total_donated": total_donated,
+                "total_servings": total_servings,
+                "ngos_served": ngos_served,
+                "daily_summary": daily_summary
+            },
+            "ngo": {
+                "food_received": food_received,
+                "deliveries_completed": deliveries_completed,
+                "donors_served": donors_served,
+                "partners_involved": partners_involved
+            },
+            "delivery": {
+                "completed": completed_tasks,
+                "success_rate": success_rate,
+                "customers_served": customers_served,
+                "active_now": active_now
+            }
         }
     })
 

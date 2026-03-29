@@ -145,7 +145,13 @@ def reject_claim(request, claim_id):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def my_claims(request):
-    claims = Claim.objects.filter(ngo=request.user)
+    user = request.user
+    if user.role == 'ngo':
+        claims = Claim.objects.filter(ngo=user).order_by('-created_at')
+    elif user.role == 'donor':
+        claims = Claim.objects.filter(food__donor=user).order_by('-created_at')
+    else:
+        claims = Claim.objects.none()
 
     return Response({
         "success": True,
@@ -163,3 +169,58 @@ def food_claims(request, food_id):
         "success": True,
         "data": ClaimSerializer(claims, many=True).data
     })
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def verify_delivery(request, claim_id):
+    try:
+        claim = Claim.objects.get(id=claim_id, ngo=request.user)
+    except Claim.DoesNotExist:
+        return Response({"error": "Claim not found"}, status=404)
+
+    # Move claim to completed
+    claim.status = 'completed'
+    claim.save()
+
+    # Move food to completed (This makes it show up in Donor's history!)
+    claim.food.status = 'completed'
+    claim.food.save()
+
+    return Response({"success": True, "message": "Delivery verified!"})
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def update_claim_status(request, claim_id):
+    try:
+        # Ensure only the donor who owns the food can approve it
+        claim = Claim.objects.get(id=claim_id, food__donor=request.user)
+    except Claim.DoesNotExist:
+        return Response({"error": "Claim not found or not authorized"}, status=404)
+
+    new_status = request.data.get('status')
+    claim.status = new_status
+    claim.save()
+
+    # 🔥 CASCADE TO THE FOOD LISTING 🔥
+    if new_status == 'accepted':
+        claim.food.status = 'claimed'  # Moves out of Donor's "Active" list
+        claim.food.save()
+    elif new_status == 'rejected':
+        claim.food.status = 'available' # Puts it back in the feed if rejected
+        claim.food.save()
+        # You would also trigger the reliability engine here to flag the NGO
+
+    return Response({"success": True, "message": f"Claim {new_status}"})
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def dispute_delivery(request, claim_id):
+    try:
+        claim = Claim.objects.get(id=claim_id, ngo=request.user)
+    except Claim.DoesNotExist:
+        return Response({"error": "Claim not found"}, status=404)
+
+    claim.status = 'disputed'
+    claim.save()
+    return Response({"success": True, "message": "Delivery disputed."})

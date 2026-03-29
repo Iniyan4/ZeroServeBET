@@ -26,4 +26,5 @@ urlpatterns = [
     path('api/v1/reliability/', include('reliability.urls')),
     path('api/v1/analytics/', include('analytics.urls')),
     path('api/v1/notifications/', include('notifications.urls')),
+    path('api/v1/ai_support/', include('ai_support.urls')),
 ]

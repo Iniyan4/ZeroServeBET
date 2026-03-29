@@ -3,7 +3,7 @@ from .models import DeliveryTask
 
 
 class DeliverySerializer(serializers.ModelSerializer):
+    claim_status = serializers.CharField(source='claim.status', read_only=True)
     class Meta:
         model = DeliveryTask
         fields = '__all__'
-        read_only_fields = ['status']

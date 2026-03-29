@@ -1,14 +1,10 @@
-from datetime import datetime, timezone
+# backend/services/urgency_engine.py
+from django.utils import timezone
 
+def calculate_urgency(food_listing):
+    now = timezone.now()
+    age_hours = (now - food_listing.prepared_at).total_seconds() / 3600
 
-def calculate_urgency(expiry_time, quantity):
-    now = datetime.now(timezone.utc)
-
-    time_left = (expiry_time - now).total_seconds() / 3600
-
-    urgency = 100 - (time_left * 10)
-
-    if quantity > 20:
-        urgency += 10
-
-    return max(0, min(100, urgency))
+    # Higher score for older food (prepared earlier)
+    score = min(100, age_hours * 10)
+    return round(score, 2)

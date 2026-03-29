@@ -1,169 +1,51 @@
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-
 from django.contrib.auth import get_user_model
-
-from reliability.models import Reliability, Violation
-from food.models import FoodListing
-
-from services.ai_agent import analyze_user  # your LLM agent
+from claims.models import Claim
+from delivery.models import DeliveryTask
 
 User = get_user_model()
 
-@api_view(['POST'])
+@api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def ai_review_user(request):
+def get_insights(request):
+    if request.user.role != 'admin':
+        return Response({"error": "Unauthorized"}, status=403)
 
-    user_id = request.data.get("user_id")
+    insights = []
 
-    try:
-        user = User.objects.get(id=user_id)
-        rel = Reliability.objects.get(user=user)
-        violations = Violation.objects.filter(user=user)
+    # 1. Analyze NGOs (Check for rejected claims by Donors)
+    ngos = User.objects.filter(role='ngo')
+    for ngo in ngos:
+        rejections = Claim.objects.filter(ngo=ngo, status='rejected').count()
+        if rejections > 0:
+            risk = 'critical' if rejections >= 3 else ('high' if rejections == 2 else 'medium')
+            action = 'restrict' if rejections >= 3 else 'review'
+            insights.append({
+                "user_id": ngo.id,
+                "username": ngo.username,
+                "role": "ngo",
+                "risk_classification": risk,
+                "ai_summary": f"This NGO has had {rejections} claim(s) explicitly rejected by Donors. This indicates potential unreliability or misuse of the platform.",
+                "suggested_action": action
+            })
 
-    except Exception as e:
-        return Response({
-            "success": False,
-            "error": "User data not found"
-        })
+    # 2. Analyze Delivery Partners (Check for disputed deliveries by NGOs)
+    partners = User.objects.filter(role='delivery')
+    for partner in partners:
+        # Find tasks assigned to this partner where the related claim was disputed by the NGO
+        disputes = DeliveryTask.objects.filter(delivery_partner=partner, claim__status='disputed').count()
+        if disputes > 0:
+            risk = 'critical' if disputes >= 2 else 'high'
+            action = 'restrict' if disputes >= 2 else 'review'
+            insights.append({
+                "user_id": partner.id,
+                "username": partner.username,
+                "role": "delivery",
+                "risk_classification": risk,
+                "ai_summary": f"This partner has been disputed {disputes} time(s) by NGOs for failing to deliver food properly or faking a delivery status.",
+                "suggested_action": action
+            })
 
-    # Prepare structured data for LLM
-    user_data = {
-        "trust_score": rel.trust_score,
-        "violations": violations.count(),
-        "no_show": rel.no_show_count,
-        "complaints": rel.complaint_count,
-        "risk_level": rel.risk_level
-    }
-
-    # 🔥 TRY LLM
-    try:
-        ai_output = analyze_user(user_data)
-
-        return Response({
-            "success": True,
-            "source": "llm",
-            "data": ai_output
-        })
-
-    # 🔒 FALLBACK (VERY IMPORTANT FOR HACKATHON)
-    except Exception as e:
-
-        recommendation = "approve"
-
-        if rel.trust_score < 40:
-            recommendation = "restrict"
-        elif rel.trust_score < 60:
-            recommendation = "review"
-
-        return Response({
-            "success": True,
-            "source": "fallback",
-            "data": {
-                "summary": f"User has score {rel.trust_score} with {violations.count()} violations",
-                "risk_level": rel.risk_level,
-                "recommendation": recommendation
-            }
-        })
-
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def ai_review_food(request):
-
-    food_id = request.data.get("food_id")
-
-    try:
-        food = FoodListing.objects.get(id=food_id)
-    except:
-        return Response({"error": "Food not found"})
-
-    issues = []
-
-    if food.urgency_score > 85:
-        issues.append("High urgency")
-
-    if not food.description:
-        issues.append("Missing description")
-
-    if food.quantity <= 0:
-        issues.append("Invalid quantity")
-
-    recommendation = "approve"
-
-    if len(issues) >= 2:
-        recommendation = "review"
-
-    return Response({
-        "success": True,
-        "data": {
-            "issues": issues,
-            "urgency_score": food.urgency_score,
-            "recommendation": recommendation
-        }
-    })
-
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def ai_complaint_summary(request):
-
-    description = request.data.get("description", "").lower()
-
-    category = "general"
-    severity = "low"
-
-    if "late" in description:
-        category = "late_delivery"
-    elif "bad" in description or "spoiled" in description:
-        category = "food_quality"
-
-    if "very" in description or "extremely" in description:
-        severity = "high"
-
-    return Response({
-        "success": True,
-        "data": {
-            "category": category,
-            "severity": severity,
-            "summary": f"Detected {category} issue with {severity} severity"
-        }
-    })
-
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def admin_ai_insight(request):
-
-    user_id = request.data.get("user_id")
-
-    try:
-        user = User.objects.get(id=user_id)
-        rel = Reliability.objects.get(user=user)
-        violations = Violation.objects.filter(user=user)
-
-    except:
-        return Response({"error": "User not found"})
-
-    user_data = {
-        "trust_score": rel.trust_score,
-        "violations": violations.count(),
-        "no_show": rel.no_show_count,
-        "complaints": rel.complaint_count,
-        "risk_level": rel.risk_level
-    }
-
-    try:
-        ai_output = analyze_user(user_data)
-
-        return Response({
-            "success": True,
-            "ai_summary": ai_output,
-            "note": "AI-assisted recommendation. Admin must decide final action."
-        })
-
-    except:
-
-        return Response({
-            "success": True,
-            "ai_summary": f"User has moderate risk with score {rel.trust_score}",
-            "note": "Fallback logic used"
-        })
+    return Response({"success": True, "data": insights})

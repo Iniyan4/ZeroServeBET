@@ -25,11 +25,8 @@ def create_food(request):
             food.food_category,
             food.prepared_at
         )
-
-        food.urgency_score = calculate_urgency(
-            food.expiry_time,
-            food.quantity
-        )
+# Updated fixed code
+    food.urgency_score = calculate_urgency(food)
 
     if food.urgency_score > 85:
     # send to nearby NGOs (simplified)
