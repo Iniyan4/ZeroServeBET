@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from food.models import FoodListing
 from delivery.models import DeliveryTask
 from claims.models import Claim
+from services.ai_agent import analyze_user
 
 
 @api_view(['GET'])
@@ -14,7 +15,6 @@ def admin_analytics(request):
     total_food = FoodListing.objects.count()
     total_delivered = FoodListing.objects.filter(status='delivered').count()
     total_claims = Claim.objects.count()
-    total_deliveries = DeliveryTask.objects.count()
 
     return Response({
         "success": True,
@@ -22,7 +22,6 @@ def admin_analytics(request):
             "total_food_listings": total_food,
             "total_delivered": total_delivered,
             "total_claims": total_claims,
-            "total_deliveries": total_deliveries,
         }
     })
 
@@ -168,7 +167,7 @@ def admin_ai_insight(request):
     # fetch reliability + performance data
 
     # pass to AI agent
-    ai_output = analyze_user(data)
+    ai_output = analyze_user(request.data)
 
     return Response({
         "success": True,

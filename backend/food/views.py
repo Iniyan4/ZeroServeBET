@@ -57,7 +57,7 @@ def create_food(request):
     return Response(serializer.errors)
 
 
-@api_view(['GET'])
+@api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
 def list_food(request):
     foods = FoodListing.objects.filter(status='available')
